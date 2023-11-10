@@ -1,6 +1,7 @@
 import torch as tc
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.nn.parameter import Parameter
 import pdb
 
 alpha_1 = 1
@@ -20,7 +21,7 @@ class Attention(nn.Module):
 
         self.d = d
 
-        self._W = nn.Parameter( tc.zeros(d,d) )
+        self._W = Parameter( tc.zeros(d,d) )
         self.reset_params()
 
     def reset_params(self):
@@ -29,7 +30,6 @@ class Attention(nn.Module):
 
     def normalize_weight(self):
         pass
-
 
     @property
     def W(self):
@@ -75,8 +75,6 @@ class Attention(nn.Module):
 
         beta = -0.5 * ((Y @ self._W) ** 2).sum(-1)
 
-        # if not self.training:
-        #     pdb.set_trace()
         A = tc.softmax( Y @ self.W @ Y.t()  , -1 )
         Z = (1-alpha_1) * Y + alpha_1 * A @ Y
 
@@ -89,8 +87,8 @@ class FFN(nn.Module):
 
         self.d = d
 
-        self._Wf = nn.Parameter( tc.zeros(d,d) )
-        self.B  = nn.Parameter( tc.zeros(1,d) )
+        self._Wf = Parameter( tc.zeros(d,d) )
+        self.B  = Parameter( tc.zeros(1,d) )
 
         self.reset_params()
 
@@ -113,7 +111,7 @@ class FFN(nn.Module):
  
     @property
     def Wf(self):
-        return - 0.5 * alpha_2 * (self._Wf + self._Wf.t()) + (1-alpha_2) * tc.eye(self.d)
+        return - 0.5 * alpha_2 * (self._Wf + self._Wf.t()) + (1-alpha_2) * tc.eye(self.d, device = self._Wf.device)
 
 
     def get_energy(self , Y):
@@ -172,15 +170,13 @@ class Transformer(nn.Module):
     def get_energy(self , Y ):
         return self.rec_layer.get_energy(Y)
 
-    def forward(self , Y):
-        
-        # if not self.training:
-        #     pdb.set_trace()
+    def forward(self , Y, no_energy = False, no_X = False):
 
-        energies = [ self.get_energy(Y) ]
+        energies = [] if no_energy else [ self.get_energy(Y) ]
         for layer_idx in range(self.num_layers):
             Y = self.rec_layer(Y)
-            energies.append( self.get_energy(Y) )
+            if not no_energy:
+                energies.append( self.get_energy(Y) )
 
         output = self.output(Y)
 

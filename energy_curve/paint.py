@@ -1,13 +1,4 @@
-from model import Transformer
 import torch as tc
-import torch.nn as nn
-import torch.nn.functional as F
-from fastNLP.io import IMDBLoader
-from fastNLP.io import IMDBPipe
-from fastNLP.embeddings import StaticEmbedding
-import pdb
-import pickle
-from pathlib import Path
 import matplotlib.pyplot as plt
 from load_data import load_data
 from tqdm import tqdm
@@ -16,7 +7,7 @@ import random
 num_test_epoch = 200
 
 def paint(model , savepath = None):
-    model = model.eval()
+    model = model.eval().cpu()
     data_bundle , word2vec_embed = load_data()
     datas = data_bundle.get_dataset("test")
 

@@ -1,14 +1,7 @@
 from model import Transformer
 import torch as tc
-import torch.nn as nn
-import torch.nn.functional as F
-from fastNLP.io import IMDBLoader
-from fastNLP.io import IMDBPipe
-from fastNLP.embeddings import StaticEmbedding
 import pdb
-import pickle
-from pathlib import Path
-import matplotlib.pyplot as plt
+import torch.backends.cudnn
 from load_data import load_data
 from paint import paint
 from tqdm import tqdm
@@ -22,8 +15,8 @@ def set_random_seed(seed):
     np.random.seed(seed)
     tc.manual_seed(seed)
     tc.cuda.manual_seed_all(seed)
-    tc.backends.cudnn.deterministic = True
-    tc.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 set_random_seed(2333)
 
