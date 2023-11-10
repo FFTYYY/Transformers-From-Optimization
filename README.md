@@ -8,7 +8,7 @@ well I admit the code is kind of disorder now, I will make them more organized l
 To reproduce all the experiments in the paper:
 ```
 # Figure 1
-python appllo_circle.py
+python apollo_circle.py
 
 # Figure 2 and 3
 python combination_energy.py
@@ -19,4 +19,5 @@ python divergence.py
 # Figure 5 and 6
 cd energy_curve
 python main.py
+python train.py
 ```
