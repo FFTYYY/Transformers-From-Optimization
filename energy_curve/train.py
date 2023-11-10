@@ -39,9 +39,6 @@ def train(model , data_bundle , word2vec_embed):
         loss.backward()
         optimizer.step()
 
-        # can remove this, but will cause NaN loss in some cases
-        model.normalize_weight() 
-
         pbar.set_postfix_str("loss = %.4f" % (float(loss)))
 
     return model
@@ -59,16 +56,17 @@ for dataset_name in ["imdb" , "sst2"]:
     data_bundle , word2vec_embed = load_data(dataset_name)
     d = word2vec_embed.embedding_dim  
 
-    model_1 = Transformer(d , num_layers , 2 , False).cuda()
+    model_1 = Transformer(d , num_layers , 2 , True ).cuda()
     model_1.normalize_weight()
-
-    model_2 = Transformer(d , num_layers , 2 , True ).cuda()
-    model_2.normalize_weight()
 
     model_1 = train(model_1, data_bundle , word2vec_embed)
     model_1.normalize_weight()
-    model_2 = train(model_2, data_bundle , word2vec_embed)
-    model_2.normalize_weight()
 
-    paint(model_1 , "../generated_figures/%s.png" % norelu_name)
-    paint(model_2 , "../generated_figures/%s.png" % relu_name)
+    paint(model_1 , "../generated_figures/%s.png" % relu_name)
+
+    # No relu will cause NaN loss....
+    # model_2 = Transformer(d , num_layers , 2 , False).cuda()
+    # model_2.normalize_weight()
+    # model_2 = train(model_2, data_bundle , word2vec_embed)
+    # model_2.normalize_weight()
+    # paint(model_2 , "../generated_figures/%s.png" % norelu_name)
